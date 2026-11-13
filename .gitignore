@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.tmp/
+.env
+credentials.json
+token.json
+__pycache__/

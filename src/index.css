@@ -1,0 +1,294 @@
+@import "tailwindcss";
+
+/* ───────────── Al-Yusr Pharmacy design tokens — dark mode only ───────────── */
+@theme {
+  /* Latin + numerals resolve to Plus Jakarta Sans, Arabic glyphs fall through to IBM Plex Sans Arabic */
+  --font-sans: "Plus Jakarta Sans", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+
+  /* Al-Yusr cyan (#009EC4, from the shield in /logo.jpeg), lifted for dark surfaces */
+  --color-brand-50: #0a2530;
+  --color-brand-100: #0f3442;
+  --color-brand-200: #1b5062;
+  --color-brand-300: #2b7d94;
+  --color-brand-500: #22d3ee;
+  --color-brand-600: #22d3ee;
+  --color-brand-700: #22d3ee; /* links and accents */
+  --color-brand-800: #a5f3fc;
+  --color-brand-900: #f8fafc; /* headings */
+  --color-brand: #009ec4;
+
+  /* Soft cyan-tinted fills — badges, active states, icon pods */
+  --color-tint: #0d2f3d;
+  --color-tint-200: #134152;
+  --color-tint-300: #1d5a6e;
+
+  /* Backgrounds */
+  --color-paper: #030b10;
+  --color-mist: #071a25; /* recessed inputs */
+  --color-surface: #12303f; /* raised pods on glass */
+
+  /* Warm coral — reserved for high-priority CTAs */
+  --color-coral: #f2846b;
+  --color-coral-600: #f59a85;
+  --color-coral-700: #f9a996;
+  --color-coral-50: #33201c;
+
+  --color-ink: #f8fafc;
+  --color-muted: #94a3b8;
+  --color-label: #7dd3fc;
+  --color-line: rgb(255 255 255 / 0.1);
+  --color-on-brand: #04121a; /* text on cyan buttons */
+  --color-on-coral: #1b0d09; /* text on coral buttons */
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 28px -14px rgb(0 0 0 / 0.6);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.35), 0 24px 48px -20px rgb(0 0 0 / 0.75);
+
+  --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pop: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes pop {
+    from {
+      transform: scale(0.6);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+}
+
+/* Floating medicine capsules (see src/components/FloatingCapsules.tsx) */
+@keyframes floatSlow {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  50% {
+    translate: 0 -24px;
+    rotate: 7deg;
+  }
+}
+@keyframes floatMedium {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  33% {
+    translate: 12px -18px;
+    rotate: -6deg;
+  }
+  66% {
+    translate: -9px 12px;
+    rotate: 5deg;
+  }
+}
+@keyframes floatReverse {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  50% {
+    translate: 0 22px;
+    rotate: -8deg;
+  }
+}
+.float-slow {
+  animation: floatSlow 11s ease-in-out infinite;
+}
+.float-medium {
+  animation: floatMedium 8s ease-in-out infinite;
+}
+.float-reverse {
+  animation: floatReverse 13s ease-in-out infinite;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Nothing (floating capsules, glows, animations) may widen the page on phones.
+     `clip` instead of `hidden`: it does not create a scroll container, so the sticky header keeps working. */
+  #root {
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Arabic script needs more vertical room and must never be letter-spaced */
+  html[lang="ar"] body {
+    line-height: 1.75;
+    letter-spacing: 0;
+  }
+
+  button:not(:disabled),
+  [role="button"],
+  label[for],
+  select {
+    cursor: pointer;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgb(34 211 238 / 0.35);
+    color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ───────────── Backdrop ───────────── */
+
+/* Fixed deep midnight gradient with soft cyan / teal / coral glows. */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 38rem at 85% -8%, rgb(0 158 196 / 0.28), transparent 62%),
+    radial-gradient(44rem 34rem at 4% 30%, rgb(20 184 166 / 0.16), transparent 62%),
+    radial-gradient(38rem 28rem at 22% 96%, rgb(224 122 95 / 0.12), transparent 62%),
+    radial-gradient(50rem 36rem at 80% 104%, rgb(0 158 196 / 0.18), transparent 62%),
+    linear-gradient(160deg, #030b10 0%, #061824 52%, #041018 100%);
+}
+.ambient > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(6px);
+  transform: scale(1.04);
+  opacity: 0.35;
+}
+
+/* ───────────── Glassmorphism ───────────── */
+
+/* Frosted dark cyan glass: nav, search, banners. Specular top/left edge + soft cyan glow. */
+@utility glass {
+  background-color: rgb(10 34 48 / 0.45);
+  border: 1px solid rgb(255 255 255 / 0.15);
+  border-top-color: rgb(255 255 255 / 0.3);
+  border-inline-start-color: rgb(255 255 255 / 0.22);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.08) inset,
+    0 0 28px rgb(0 158 196 / 0.07) inset,
+    0 18px 50px -22px rgb(0 0 0 / 0.75),
+    0 0 44px -20px rgb(0 158 196 / 0.4);
+  -webkit-backdrop-filter: blur(40px) saturate(1.5);
+  backdrop-filter: blur(40px) saturate(1.5);
+}
+
+/* Denser glass for surfaces that carry a lot of text (modals, drawer, dropdowns). */
+@utility glass-strong {
+  background-color: rgb(8 28 40 / 0.84);
+  border: 1px solid rgb(255 255 255 / 0.15);
+  border-top-color: rgb(255 255 255 / 0.3);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.08) inset,
+    0 30px 70px -28px rgb(0 0 0 / 0.85),
+    0 0 60px -24px rgb(0 158 196 / 0.35);
+  -webkit-backdrop-filter: blur(40px) saturate(1.5);
+  backdrop-filter: blur(40px) saturate(1.5);
+}
+
+/* Large outer window (hero frame) — lighter, so capsules behind it read clearly. */
+@utility glass-frame {
+  background-color: rgb(13 43 61 / 0.32);
+  border: 1px solid rgb(255 255 255 / 0.15);
+  border-top-color: rgb(255 255 255 / 0.3);
+  border-inline-start-color: rgb(255 255 255 / 0.22);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.08) inset,
+    0 0 60px rgb(0 158 196 / 0.06) inset,
+    0 40px 90px -40px rgb(0 0 0 / 0.8),
+    0 0 80px -30px rgb(0 158 196 / 0.35);
+  -webkit-backdrop-filter: blur(40px) saturate(1.4);
+  backdrop-filter: blur(40px) saturate(1.4);
+}
+
+/* Repeated cards: same glass, lighter blur so long grids stay smooth. */
+@utility glass-flat {
+  background-color: rgb(13 43 61 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-top-color: rgb(255 255 255 / 0.26);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.06) inset,
+    0 14px 36px -22px rgb(0 0 0 / 0.75);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  &:hover {
+    border-color: rgb(34 211 238 / 0.5);
+  }
+}
+
+/* Primary pill button: Al-Yusr cyan gradient with a soft glow. */
+@utility btn-primary {
+  background-image: linear-gradient(to right, #009ec4, #22d3ee);
+  color: var(--color-on-brand);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.35) inset,
+    0 10px 26px -12px rgb(34 211 238 / 0.65);
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Numbers, prices and dosages: always Latin digits, aligned */
+  .num {
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  .thin-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-tint-300) transparent;
+  }
+}
